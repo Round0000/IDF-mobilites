@@ -41,7 +41,7 @@ function getChateletRerB(res) {
       res.set('Content-Type', 'text/html');
 
       let content = '';
-      sortedResults.forEach(el => content += el.time + ' - ' + el.code + ' - ' + el.destination + '<br>' );
+      sortedResults.forEach(el => content += el.time + ' - ' + el.code + ' - ' + el.destination + '<br><br>' );
       
       res.send(Buffer.from(`<p>${content}</p>`));
       // res.send(results.sort((a, b) => a.time - b.time));
