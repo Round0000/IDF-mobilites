@@ -24,10 +24,12 @@ function getChateletRerB(res) {
           if (
             item.MonitoredVehicleJourney.LineRef.value !== "STIF:Line::C01743:"
           ) return;
+          const time = new Date(
+            item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
+          );
+          time.setHours(time.getHours() + 1);
           const data = {
-            time: new Date(
-              item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
-            ).toLocaleString('fr-FR'),
+            time: time.toLocaleTimeString('fr-FR'),
             destination:
               item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
                 .value,
@@ -41,7 +43,7 @@ function getChateletRerB(res) {
       res.set('Content-Type', 'text/html');
 
       let content = '';
-      sortedResults.forEach(el => content += '<strong>' + el.time.slice(12) + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>' );
+      sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>' );
       
       res.send(Buffer.from(`<p style="font-family: Roboto, sans-serif;">${content}</p>`));
       // res.send(results.sort((a, b) => a.time - b.time));
