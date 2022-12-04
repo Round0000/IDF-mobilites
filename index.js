@@ -14,7 +14,7 @@ const options = {
   headers: { Accept: "application/json", apikey: apiKey },
 };
 
-function getChateletRerB() {
+function getChateletRerB(res) {
   fetch(url, options)
     .then((res) => res.json())
     .then((json) => {
@@ -23,8 +23,7 @@ function getChateletRerB() {
         (item) => {
           if (
             item.MonitoredVehicleJourney.LineRef.value !== "STIF:Line::C01743:"
-          )
-            return;
+          ) return;
           const data = {
             time: new Date(
               item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
@@ -38,14 +37,23 @@ function getChateletRerB() {
           return data;
         }
       );
-      console.log(results.sort((a, b) => a.time - b.time))
+      const sortedResults = results.sort((a, b) => a.time - b.time);
+      res.set('Content-Type', 'text/html');
+
+      let content = '';
+      sortedResults.forEach(el => content += el.time + ' - ' + el.code + ' - ' + el.destination + '<br>' );
+      
+      res.send(Buffer.from(`<p>${content}</p>`));
+      // res.send(results.sort((a, b) => a.time - b.time));
       return results.sort((a, b) => a.time - b.time);
     })
     .catch((err) => console.error("error:" + err));
 }
 
 app.get("/", (req, res) => {
-  res.send(getChateletRerB());
+
+  getChateletRerB(res);
+
 });
 
 app.listen(port, () => {
