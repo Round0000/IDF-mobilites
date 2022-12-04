@@ -24,6 +24,7 @@ function getChateletRerB(res) {
           if (
             item.MonitoredVehicleJourney.LineRef.value !== "STIF:Line::C01743:"
           ) return;
+          if (!item.MonitoredVehicleJourney.DirectionName[0].value.includes('AEROPORT')) return;
           const time = new Date(
             item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
           );
@@ -45,7 +46,7 @@ function getChateletRerB(res) {
       let content = '';
       sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>' );
       
-      res.send(Buffer.from(`<p style="font-family: Roboto, sans-serif;">${content}</p>`));
+      res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
       return results.sort((a, b) => a.time - b.time);
     })
