@@ -27,7 +27,7 @@ function getChateletRerB(res) {
           const data = {
             time: new Date(
               item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
-            ).toLocaleString(),
+            ).toLocaleString('fr-FR'),
             destination:
               item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
                 .value,
