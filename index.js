@@ -27,7 +27,7 @@ function getChateletRerB(res) {
           const data = {
             time: new Date(
               item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
-            ).toLocaleTimeString("fr-FR"),
+            ).toLocaleString(),
             destination:
               item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
                 .value,
@@ -37,13 +37,13 @@ function getChateletRerB(res) {
           return data;
         }
       );
-      const sortedResults = results.sort((a, b) => a.time - b.time);
+      const sortedResults = results.sort((a, b) => new Date(a.time) - new Date(b.time));
       res.set('Content-Type', 'text/html');
 
       let content = '';
-      sortedResults.forEach(el => content += el.time + ' - ' + el.code + ' - ' + el.destination + '<br><br>' );
+      sortedResults.forEach(el => content += '<strong>' + el.time.slice(12) + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>' );
       
-      res.send(Buffer.from(`<p>${content}</p>`));
+      res.send(Buffer.from(`<p style="font-family: Roboto, sans-serif;">${content}</p>`));
       // res.send(results.sort((a, b) => a.time - b.time));
       return results.sort((a, b) => a.time - b.time);
     })
