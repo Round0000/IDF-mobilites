@@ -30,7 +30,6 @@ function getChateletRerB(res) {
           const time = new Date(
             item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
           );
-          time.setHours(time.getHours() + 1);
           const data = {
             time: time.toLocaleTimeString('fr-FR'),
             destination:
@@ -72,7 +71,8 @@ function getCDGRerB(res) {
             item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
           );
 
-          time.setHours(time.getHours() + 1);
+          if (new Date() > time) return;
+
           const data = {
             time: time.toLocaleTimeString('fr-FR'),
             destination:
@@ -86,6 +86,7 @@ function getCDGRerB(res) {
         }
       );
       const sortedResults = results.sort((a, b) => new Date(a.time) - new Date(b.time));
+      sortedResults.length = 5;
       res.set('Content-Type', 'text/html');
 
       let content = '';
@@ -93,6 +94,7 @@ function getCDGRerB(res) {
 
       res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
+      console.log(results)
       return results.sort((a, b) => a.time - b.time);
     })
     .catch((err) => console.error("error:" + err));
