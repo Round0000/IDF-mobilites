@@ -27,14 +27,22 @@ function getChateletRerB(res) {
             item.MonitoredVehicleJourney.LineRef.value !== "STIF:Line::C01743:"
           ) return;
           if (!item.MonitoredVehicleJourney.DirectionName[0].value.includes('AEROPORT')) return;
-          const time = new Date(
+          if (item.MonitoredVehicleJourney.MonitoredCall.DepartureStatus === "cancelled") return;
+
+          let time = new Date(
             item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
           );
+
+          if (new Date() > time) return;
+
+          const timeFormatter = Intl.DateTimeFormat('fr-FR', { timeZone: "Europe/Paris", timeStyle: 'medium' });
+          time = timeFormatter.format(time);
+
+          const destination = item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0].value.slice(0, 26) + ' ...';
+
           const data = {
-            time: time.toLocaleTimeString('fr-FR'),
-            destination:
-              item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
-                .value,
+            time: time,
+            destination: destination,
             code: item.MonitoredVehicleJourney.JourneyNote[0].value,
           };
           results.push(data);
@@ -65,23 +73,24 @@ function getCDGRerB(res) {
           if (
             item.MonitoredVehicleJourney.LineRef.value !== "STIF:Line::C01743:"
           ) return;
-
           if (item.MonitoredVehicleJourney.DestinationName[0].value.includes('CDG')) return;
-          const time = new Date(
+          if (item.MonitoredVehicleJourney.MonitoredCall.DepartureStatus === "cancelled") return;
+
+          let time = new Date(
             item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
           );
 
-          if (item.MonitoredVehicleJourney.MonitoredCall.DepartureStatus === "cancelled") return;
-
           if (new Date() > time) return;
 
-          console.log(time, time.toLocaleTimeString('fr-FR', [{timeZone: 'Europe/Paris'}]))
+          const timeFormatter = Intl.DateTimeFormat('fr-FR', { timeZone: "Europe/Paris", timeStyle: 'medium' });
+          time = timeFormatter.format(time);
+
+          const destination = item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
+            .value.slice(0, 22) + '...';
 
           const data = {
-            time: time.toLocaleTimeString('fr-FR', [{timeZone: 'Europe/Paris'}]),
-            destination:
-              item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
-                .value,
+            time: time,
+            destination: destination,
             code: item.MonitoredVehicleJourney.JourneyNote[0].value,
             platform: item.MonitoredVehicleJourney.MonitoredCall.ArrivalPlatformName.value
           };
