@@ -49,7 +49,7 @@ function getChateletRerB(res) {
 
       res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
-      console.log(results)
+      console.table(results)
       return results.sort((a, b) => a.time - b.time);
     })
     .catch((err) => console.error("error:" + err));
@@ -71,10 +71,14 @@ function getCDGRerB(res) {
             item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
           );
 
+          if (item.MonitoredVehicleJourney.MonitoredCall.DepartureStatus === "cancelled") return;
+
           if (new Date() > time) return;
 
+          console.log(time, time.toLocaleTimeString('fr-FR', [{timeZone: 'Europe/Paris'}]))
+
           const data = {
-            time: time.toLocaleTimeString('fr-FR'),
+            time: time.toLocaleTimeString('fr-FR', [{timeZone: 'Europe/Paris'}]),
             destination:
               item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
                 .value,
@@ -94,7 +98,7 @@ function getCDGRerB(res) {
 
       res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
-      console.log(results)
+      console.table(results)
       return results.sort((a, b) => a.time - b.time);
     })
     .catch((err) => console.error("error:" + err));
