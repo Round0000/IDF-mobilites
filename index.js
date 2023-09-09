@@ -2,8 +2,10 @@ const express = require("express");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-const url =
+const urlChatelet =
   "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring?MonitoringRef=STIF:StopPoint:Q:45102:";
+const urlCDG =
+  "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring?MonitoringRef=STIF:StopPoint:Q:462398:";
 const apiKey = "kg04GTyBX5uPsC9JT4YffEOJrIKHfanN";
 //
 const app = express();
@@ -15,7 +17,7 @@ const options = {
 };
 
 function getChateletRerB(res) {
-  fetch(url, options)
+  fetch(urlChatelet, options)
     .then((res) => res.json())
     .then((json) => {
       const results = [];
@@ -44,19 +46,64 @@ function getChateletRerB(res) {
       res.set('Content-Type', 'text/html');
 
       let content = '';
-      sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>' );
-      
+      sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>');
+
       res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>${content}</div>`));
+      // res.send(results.sort((a, b) => a.time - b.time));
+      console.log(results)
+      return results.sort((a, b) => a.time - b.time);
+    })
+    .catch((err) => console.error("error:" + err));
+}
+
+function getCDGRerB(res) {
+  fetch(urlCDG, options)
+    .then((res) => res.json())
+    .then((json) => {
+      const results = [];
+      json.Siri.ServiceDelivery.StopMonitoringDelivery[0].MonitoredStopVisit.forEach(
+        (item) => {
+          if (
+            item.MonitoredVehicleJourney.LineRef.value !== "STIF:Line::C01743:"
+          ) return;
+
+          if (item.MonitoredVehicleJourney.DestinationName[0].value.includes('CDG')) return;
+          const time = new Date(
+            item.MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime
+          );
+
+          time.setHours(time.getHours() + 1);
+          const data = {
+            time: time.toLocaleTimeString('fr-FR'),
+            destination:
+              item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
+                .value,
+            code: item.MonitoredVehicleJourney.JourneyNote[0].value,
+            platform: item.MonitoredVehicleJourney.MonitoredCall.ArrivalPlatformName.value
+          };
+          results.push(data);
+          return data;
+        }
+      );
+      const sortedResults = results.sort((a, b) => new Date(a.time) - new Date(b.time));
+      res.set('Content-Type', 'text/html');
+
+      let content = '';
+      sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> -<em>' + el.platform + '- ' + el.code + '</em> ' + el.destination + '<br><br>');
+
+      res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
       return results.sort((a, b) => a.time - b.time);
     })
     .catch((err) => console.error("error:" + err));
 }
 
-app.get("/", (req, res) => {
-
+app.get("/chatelet", (req, res) => {
   getChateletRerB(res);
+});
 
+app.get("/cdg", (req, res) => {
+  getCDGRerB(res);
 });
 
 app.listen(port, () => {
