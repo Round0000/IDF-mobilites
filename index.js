@@ -53,7 +53,7 @@ function getChateletRerB(res) {
       res.set('Content-Type', 'text/html');
 
       let content = '';
-      sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>');
+      sortedResults.forEach(el => content += '<strong style="font-size: 1.25rem;">' + el.time + '</strong> - <em>' + el.code + '</em> - ' + el.destination + '<br><br>');
 
       res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
@@ -103,7 +103,7 @@ function getCDGRerB(res) {
       res.set('Content-Type', 'text/html');
 
       let content = '';
-      sortedResults.forEach(el => content += '<strong>' + el.time + '</strong> -<em>' + el.platform + '- ' + el.code + '</em> ' + el.destination + '<br><br>');
+      sortedResults.forEach(el => content += '<strong style="font-size: 1.25rem;">' + el.time + '</strong> -<em>' + el.platform + '- ' + el.code + '</em> ' + el.destination + '<br><br>');
 
       res.send(Buffer.from(`<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>${content}</div>`));
       // res.send(results.sort((a, b) => a.time - b.time));
