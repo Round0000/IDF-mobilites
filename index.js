@@ -27,12 +27,15 @@ function getChateletRerB(res) {
             item.MonitoredVehicleJourney.LineRef?.value !== "STIF:Line::C01743:"
           )
             return;
-          if (
-            !item.MonitoredVehicleJourney.DirectionName[0]?.value.includes(
-              "AEROPORT"
+
+          const directionName =
+            item.MonitoredVehicleJourney.DirectionName[0]?.value;
+            if (
+              !directionName.includes("AEROPORT") &&
+              !directionName.includes("Aéro")
             )
-          )
             return;
+            console.log(directionName)
           if (
             item.MonitoredVehicleJourney.MonitoredCall.DepartureStatus ===
             "cancelled"
@@ -57,7 +60,7 @@ function getChateletRerB(res) {
               26
             ) + " ...";
 
-            console.log(destination)
+          console.log(destination);
 
           const data = {
             time: time,
@@ -137,7 +140,7 @@ function getCDGRerB(res) {
             item.MonitoredVehicleJourney.MonitoredCall.DestinationDisplay[0]
               ?.value;
 
-              console.log(destination)
+          console.log(destination);
 
           if (destination) {
             destination = destination.slice(0, 22) + "...";
@@ -145,7 +148,7 @@ function getCDGRerB(res) {
             return;
           }
 
-          if (destination.includes('Aéroport')) {
+          if (destination.includes("Aéroport")) {
             return;
           }
 
@@ -155,7 +158,7 @@ function getCDGRerB(res) {
             code: item.MonitoredVehicleJourney.JourneyNote[0]?.value,
             platform:
               item.MonitoredVehicleJourney.MonitoredCall.ArrivalPlatformName
-                ?.value || '??',
+                ?.value || "??",
           };
           results.push(data);
           return data;
