@@ -20,7 +20,10 @@ function getChateletRerB(res) {
   fetch(urlChatelet, options)
     .then((res) => res.json())
     .then((json) => {
+      res.set("Content-Type", "text/html");
+
       const results = [];
+
       json.Siri.ServiceDelivery.StopMonitoringDelivery[0].MonitoredStopVisit.forEach(
         (item) => {
           if (
@@ -30,12 +33,11 @@ function getChateletRerB(res) {
 
           const directionName =
             item.MonitoredVehicleJourney.DirectionName[0]?.value;
-            if (
-              !directionName.includes("AEROPORT") &&
-              !directionName.includes("Aéro")
-            )
+          if (
+            !directionName.includes("AEROPORT") &&
+            !directionName.includes("Aéro")
+          )
             return;
-            console.log(directionName)
           if (
             item.MonitoredVehicleJourney.MonitoredCall.DepartureStatus ===
             "cancelled"
@@ -71,10 +73,10 @@ function getChateletRerB(res) {
           return data;
         }
       );
+
       const sortedResults = results.sort(
         (a, b) => new Date(a.time) - new Date(b.time)
       );
-      res.set("Content-Type", "text/html");
 
       let content = "";
       sortedResults.forEach(
@@ -89,11 +91,19 @@ function getChateletRerB(res) {
             "<br><br>")
       );
 
-      res.send(
-        Buffer.from(
-          `<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>${content}</div>`
-        )
-      );
+      if (content?.length) {
+        res.send(
+          Buffer.from(
+            `<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>${content}</div>`
+          )
+        );
+      } else {
+        res.send(
+          Buffer.from(
+            `<div style="font-family: Roboto, sans-serif;"><h3>Châtelet vers CDG/Mitry</h3>Je ne dirais pas que c'est un échec : ça n'a pas marché...</div>`
+          )
+        );
+      }
       // res.send(results.sort((a, b) => a.time - b.time));
       console.table(results);
       return results.sort((a, b) => a.time - b.time);
@@ -148,7 +158,10 @@ function getCDGRerB(res) {
             return;
           }
 
-          if (destination.includes("Aéroport")) {
+          if (
+            destination.includes("Aéroport") ||
+            destination.includes("AERO")
+          ) {
             return;
           }
 
@@ -185,11 +198,20 @@ function getCDGRerB(res) {
             "<br><br>")
       );
 
-      res.send(
-        Buffer.from(
-          `<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>${content}</div>`
-        )
-      );
+      if (content?.length) {
+        res.send(
+          Buffer.from(
+            `<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>${content}</div>`
+          )
+        );
+      } else {
+        res.send(
+          Buffer.from(
+            `<div style="font-family: Roboto, sans-serif;"><h3>CDG Roissypôle vers le sud</h3>Je ne dirais pas que c'est un échec : ça n'a pas marché...</div>`
+          )
+        );
+      }
+
       // res.send(results.sort((a, b) => a.time - b.time));
       console.table(results);
       return results.sort((a, b) => a.time - b.time);
